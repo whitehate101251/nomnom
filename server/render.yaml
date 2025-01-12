@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: nomnom-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: PORT
+        value: 3001
+      - key: CLIENT_URL
+        value: https://nomnom-web.vercel.app 

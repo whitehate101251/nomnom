@@ -5,39 +5,43 @@ services:
   client:
     build:
       context: ./client
-      dockerfile: Dockerfile
+      target: development
     ports:
-      - "80:80"
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001
     depends_on:
       - api
     networks:
       - app-network
+    command: npm start
 
   # Backend service
   api:
     build:
       context: ./server
-      dockerfile: Dockerfile
+      target: development
     ports:
       - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=${MONGODB_URI}
-      - JWT_SECRET=${JWT_SECRET}
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
-      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
-      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
-      - EMAIL_HOST=${EMAIL_HOST}
-      - EMAIL_PORT=${EMAIL_PORT}
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASS=${EMAIL_PASS}
     volumes:
-      - ./server/uploads:/usr/src/app/uploads
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/nomnom
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=3001
+      - CLIENT_URL=http://localhost:3000
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - mongo
+      - redis
     networks:
       - app-network
+    command: npm run dev
 
   # MongoDB service
   mongo:

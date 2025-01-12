@@ -1,11 +1,34 @@
-# Use Node.js LTS version
-FROM node:18-alpine
+# Development stage
+FROM node:18-alpine as development
 
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
+# Copy package files
 COPY package*.json ./
+
+# Install all dependencies including devDependencies
+RUN npm install
+
+# Copy app source
+COPY . .
+
+# Expose port
+EXPOSE 3001
+
+# Start development server with nodemon
+CMD ["npm", "run", "dev"]
+
+# Production stage
+FROM node:18-alpine as production
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
 RUN npm ci --only=production
 
 # Copy app source
